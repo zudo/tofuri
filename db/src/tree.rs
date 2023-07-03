@@ -6,7 +6,6 @@ use rocksdb::DB;
 use std::collections::HashMap;
 use tracing::instrument;
 use tree::Tree;
-use tree::GENESIS_BLOCK_PREVIOUS_HASH;
 #[instrument(skip_all, level = "debug")]
 pub fn reload(db: &DB, tree: &mut Tree) -> Result<(), Error> {
     tree.clear();
@@ -32,7 +31,7 @@ pub fn reload(db: &DB, tree: &mut Tree) -> Result<(), Error> {
     if map.is_empty() {
         return Ok(());
     }
-    let previous_hash = GENESIS_BLOCK_PREVIOUS_HASH;
+    let previous_hash = [0; 32];
     let mut previous_hashes = vec![previous_hash];
     let mut hashes_0 = vec![];
     for (hash, timestamp) in map.get(&previous_hash).expect("genesis block hashes") {

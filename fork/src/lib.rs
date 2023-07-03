@@ -14,7 +14,6 @@ use tracing::debug;
 use tracing::warn;
 use transaction::Transaction;
 use tree::Tree;
-use tree::GENESIS_BLOCK_PREVIOUS_HASH;
 use uint::construct_uint;
 pub const BLOCK_TIME: u32 = 60;
 pub const ELAPSED: u32 = 90;
@@ -263,7 +262,7 @@ impl Manager {
         trust_fork_after_blocks: usize,
         previous_hash: &[u8; 32],
     ) -> Result<Unstable, Error> {
-        if previous_hash == &GENESIS_BLOCK_PREVIOUS_HASH {
+        if previous_hash == &[0; 32] {
             let unstable = Unstable::default();
             return Ok(unstable);
         }
@@ -280,11 +279,11 @@ impl Manager {
                 None => break,
             };
         }
-        if first != &hash && hash != GENESIS_BLOCK_PREVIOUS_HASH {
+        if first != &hash && hash != [0; 32] {
             return Err(Error::NotAllowedToForkStableChain);
         }
         if let Some(hash) = hashes.last() {
-            if hash == &GENESIS_BLOCK_PREVIOUS_HASH {
+            if hash == &[0; 32] {
                 hashes.pop();
             }
         }

@@ -3,7 +3,6 @@ use serde::Serialize;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
-pub const GENESIS_BLOCK_PREVIOUS_HASH: [u8; 32] = [0; 32];
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Branch {
     pub hash: [u8; 32],
@@ -79,7 +78,7 @@ impl Tree {
             }
         }
         if let Some(hash) = stable_hashes.last() {
-            if hash != &GENESIS_BLOCK_PREVIOUS_HASH {
+            if hash != &[0; 32] {
                 panic!("broken chain")
             }
             stable_hashes.pop();
@@ -107,7 +106,7 @@ impl Tree {
             }
         }
         if let Some(hash) = vec.last() {
-            if hash == &GENESIS_BLOCK_PREVIOUS_HASH {
+            if hash == &[0; 32] {
                 vec.pop();
             }
         }

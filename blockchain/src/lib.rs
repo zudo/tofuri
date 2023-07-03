@@ -18,9 +18,7 @@ use tracing::instrument;
 use tracing::warn;
 use transaction::Transaction;
 use tree::Tree;
-use tree::GENESIS_BLOCK_PREVIOUS_HASH;
 pub const BLOCK_SIZE_LIMIT: usize = 57797;
-pub const GENESIS_BLOCK_BETA: [u8; 32] = [0; 32];
 lazy_static! {
     pub static ref EMPTY_BLOCK_SIZE: usize = bincode::serialize(&Block::default()).unwrap().len();
     pub static ref TRANSACTION_SIZE: usize =
@@ -198,14 +196,7 @@ impl Blockchain {
                 key,
                 &self.forks.unstable.latest_block.beta().unwrap(),
             ),
-            None => Block::sign(
-                GENESIS_BLOCK_PREVIOUS_HASH,
-                timestamp,
-                transactions,
-                stakes,
-                key,
-                &GENESIS_BLOCK_BETA,
-            ),
+            None => Block::sign([0; 32], timestamp, transactions, stakes, key, &[0; 32]),
         };
         let block = res.unwrap();
         self.save_block(db, &block, true, trust_fork_after_blocks);
@@ -392,9 +383,7 @@ impl Blockchain {
         if self.tree.get(&block.hash()).is_some() {
             return Err(Error::BlockHashInTree);
         }
-        if block.previous_hash != GENESIS_BLOCK_PREVIOUS_HASH
-            && self.tree.get(&block.previous_hash).is_none()
-        {
+        if block.previous_hash != [0; 32] && self.tree.get(&block.previous_hash).is_none() {
             return Err(Error::BlockPreviousHashNotInTree);
         }
         if block.timestamp > timestamp {
